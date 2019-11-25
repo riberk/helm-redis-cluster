@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "redis-helm.fullname" . }}
+  name: {{ include "redis-cluster.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "redis-helm.name" . }}
-    helm.sh/chart: {{ include "redis-helm.chart" . }}
+    app.kubernetes.io/name: {{ include "redis-cluster.name" . }}
+    helm.sh/chart: {{ include "redis-cluster.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name | quote }}
     app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
 spec:
@@ -19,5 +19,5 @@ spec:
       protocol: TCP
       name: gossip
   selector:
-    app.kubernetes.io/name: {{ include "redis-helm.name" . }}
+    app.kubernetes.io/name: {{ include "redis-cluster.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name | quote }}

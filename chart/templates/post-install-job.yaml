@@ -34,5 +34,5 @@ spec:
       volumes:
       - name: conf
         configMap:
-          name: {{ include "redis-helm.fullname" $ }}
+          name: {{ include "redis-cluster.fullname" $ }}
           defaultMode: 0700

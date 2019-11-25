@@ -2,11 +2,11 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "redis-helm.name" -}}
+{{- define "redis-cluster.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "redis-helm.name-inner" -}}
+{{- define "redis-cluster.name-inner" -}}
 {{- default $.Chart.Name $.Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
@@ -15,7 +15,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "redis-helm.fullname" -}}
+{{- define "redis-cluster.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -30,7 +30,7 @@ If release name contains chart name it will be used as a full name.
 
 
 
-{{- define "redis-helm.fullname-inner" -}}
+{{- define "redis-cluster.fullname-inner" -}}
 {{- if $.Values.fullnameOverride -}}
 {{- $.Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -46,6 +46,6 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "redis-helm.chart" -}}
+{{- define "redis-cluster.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
