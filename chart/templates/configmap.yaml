@@ -28,7 +28,7 @@ data:
     # create cluster
     MASTER_0_IP="$(dig ${STS_NAME}-0-0.${HEADLESS_SVC}.${NAMESPACE}.svc.${CLUSTER_DOMAIN} +answer +short)"
     MASTERIPS=("${MASTER_0_IP}:6379");
-    for masterNumber in {1..${MASTER_COUNT}} 
+    for (( masterNumber=1; masterNumber<=$((${MASTER_COUNT} - 1)); masterNumber++ ))
     do
       MASTERIP="$(dig ${STS_NAME}-${masterNumber}-0.${HEADLESS_SVC}.${NAMESPACE}.svc.${CLUSTER_DOMAIN} +answer +short)"
       MASTERIPS+=("${MASTERIP}:6379")
@@ -39,10 +39,10 @@ data:
       --cluster create ${MASTERIPS[@]} \
       --cluster-replicas 0 --cluster-yes
 
-    for masterNumber in {0..${MASTER_COUNT}} 
+    for (( masterNumber=0; masterNumber<=$((${MASTER_COUNT} - 1)); masterNumber++ ))
     do
       MASTERID="$(redis-cli -h ${MASTER_0_IP} -p 6379 cluster nodes | grep ${MASTERIPS[${masterNumber}]} | cut -d" " -f1)"
-      for replicaNumber in {1..${REPLICA_COUNT}} 
+      for (( replicaNumber=1; replicaNumber<=$REPLICA_COUNT; replicaNumber++ ))
       do
         REPLICAIP=$(dig ${STS_NAME}-${masterNumber}-${replicaNumber}.${HEADLESS_SVC}.${NAMESPACE}.svc.${CLUSTER_DOMAIN} +answer +short)
 
