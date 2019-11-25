@@ -1,0 +1,26 @@
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "redis-helm.fullname" . }}-headless
+  labels:
+    app.kubernetes.io/name: {{ include "redis-helm.name" . }}-headless
+    helm.sh/chart: {{ include "redis-helm.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.service.redisPort }}
+      targetPort: redis
+      protocol: TCP
+      name: redis
+    - port: {{ .Values.service.gossipPort }}
+      targetPort: gossip
+      protocol: TCP
+      name: gossip
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: {{ include "redis-helm.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}

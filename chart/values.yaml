@@ -1,0 +1,30 @@
+replicationFactor: 1
+clusterFactor: 3
+clusterDomain: cluster.local
+
+image:
+  repository: redis
+  tag: 5.0.7-alpine
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  redisPort: 6379
+  gossipPort: 16379
+
+
+storageSize: 1Gi
+
+resources: 
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

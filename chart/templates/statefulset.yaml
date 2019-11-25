@@ -1,0 +1,76 @@
+{{ $masterCount := .Values.clusterFactor | int }}
+{{range $i, $e := until $masterCount }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "redis-helm.fullname" $ }}-{{ $i }}
+  labels:
+    app.kubernetes.io/name: {{ include "redis-helm.name" $ }}-{{ $i }}
+    helm.sh/chart: {{ include "redis-helm.chart" $ }}
+    app.kubernetes.io/instance: "{{ $.Release.Name }}"
+    app.kubernetes.io/managed-by: "{{ $.Release.Service }}"
+spec:
+  serviceName: {{ include "redis-helm.fullname" $ }}-headless
+  replicas: {{ add $.Values.replicationFactor 1 }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "redis-helm.name" $ }}
+      app.kubernetes.io/instance: "{{ $.Release.Name }}"
+      masterNumber: "{{ $i }}"
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "redis-helm.name" $ }}
+        app.kubernetes.io/instance: "{{ $.Release.Name }}"
+        masterNumber: "{{ $i }}"
+    spec:
+      containers:
+      - name: {{ $.Chart.Name }}
+        image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+        ports:
+        - containerPort: 6379
+          name: redis
+        - containerPort: 16379
+          name: gossip
+        command: ["/conf/update-node.sh", "redis-server", "/conf/redis.conf"]
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        volumeMounts:
+        - name: conf
+          mountPath: /conf
+          readOnly: true
+        - name: data
+          mountPath: /data
+          readOnly: false
+        resources:
+          {{- toYaml $.Values.resources | nindent 12 }}
+      volumes:
+      - name: conf
+        configMap:
+          name: {{ include "redis-helm.fullname" $ }}
+          defaultMode: 0755
+      {{- with $.Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: "{{ $.Values.storageSize }}"
+{{end}}
