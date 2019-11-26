@@ -27,4 +27,66 @@ nodeSelector: {}
 
 tolerations: []
 
-affinity: {}
+affinityTemplate:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution: 
+    - weight: 30
+      podAffinityTerm:
+        topologyKey: failure-domain.beta.kubernetes.io/zone
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name 
+            operator: In
+            values:
+            - '{{ include "redis-cluster.name" . }}'
+          - key: app.kubernetes.io/instance 
+            operator: In
+            values:
+            - "{{ .Release.Name }}"
+    - weight: 50
+      podAffinityTerm:
+        topologyKey: kubernetes.io/hostname
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name 
+            operator: In
+            values:
+            - '{{ include "redis-cluster.name" . }}'
+          - key: app.kubernetes.io/instance 
+            operator: In
+            values:
+            - "{{ .Release.Name }}"
+    - weight: 80
+      podAffinityTerm:
+        topologyKey: failure-domain.beta.kubernetes.io/zone
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name 
+            operator: In
+            values:
+            - '{{ include "redis-cluster.name" . }}'
+          - key: app.kubernetes.io/instance 
+            operator: In
+            values:
+            - "{{ .Release.Name }}"
+          - key: redis-cluster/sts-number
+            operator: In
+            values:
+            - "{{ .stsNumber }}"
+    - weight: 100
+      podAffinityTerm:
+        topologyKey: kubernetes.io/hostname
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name 
+            operator: In
+            values:
+            - '{{ include "redis-cluster.name" . }}'
+          - key: app.kubernetes.io/instance 
+            operator: In
+            values:
+            - "{{ .Release.Name }}"
+          - key: redis-cluster/sts-number
+            operator: In
+            values:
+            - "{{ .stsNumber }}"
